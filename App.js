@@ -1,80 +1,83 @@
 import React from 'react';
 import { StyleSheet, Text, View, StatusBar, ListView } from 'react-native';
-import { Container, Content, Header, Form, Input, Item, Button, Label, Icon, List, ListItem } from 'native-base';
 
 import * as firebase from 'firebase';
 
-//Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyC2U31PlvmQqr5eXDeMQp6GjNGUy2bxFKI",
-  authDomain: "rn-firebase-swipeable-todolist.firebaseapp.com",
-  databaseURL: "https://rn-firebase-swipeable-todolist.firebaseio.com",
-  projectId: "rn-firebase-swipeable-todolist",
+// Initialize Firebase
+const config = {
+  apiKey: "AIzaSyBuDdjtT75A-RBSxBvQodkcdO6b6H9NwK0",
+  authDomain: "swipeable-reactnative-firebase.firebaseapp.com",
+  databaseURL: "https://swipeable-reactnative-firebase.firebaseio.com",
+  projectId: "swipeable-reactnative-firebase",
   storageBucket: "",
-  messagingSenderId: "254660957839"
+  messagingSenderId: "759526944488"
 };
-
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(config);
 
 var data = []
 
-export default class Todo extends React.Component {
+import { Container, Content, Header, Form, Item, Button, Label, Input, Icon, List, ListItem } from 'native-base';
 
-  constructor(props){
+export default class App extends React.Component {
+
+  constructor(props) {
     super(props);
 
-    this.ds = new ListView.DataSource({rowHasChanged: (r1,r2) => r1 !== r2})
+    this.ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
     this.state = {
+      basic: true,
       listViewData: data,
       newContact: ""
     }
   }
 
-  componentDidMount() {
+  componentDidMount(){
 
     var that = this
 
-    firebase.database().ref('/contacts').on('child_added',function(data){
+    firebase.database().ref('/contacts').on('child_added', function(data) {
 
-      var newData = [...that.state.listViewData]  
+      var newData = [...that.state.listViewData]
       newData.push(data)
       that.setState({listViewData : newData})
+
     })
   }
 
-  addRow(data) {
-
+  addRow(data){
     var key = firebase.database().ref('/contacts').push().key
-    firebase.database().ref('/contacts').child(key).set({ name: data })
+    firebase.database().ref('/contacts').child(key).set({ name:data })
   }
 
   async deleteRow(secId, rowId, rowMap, data) {
-
     await firebase.database().ref('contacts/'+data.key).set(null)
 
     rowMap[`${secId}${rowId}`].props.closeRow();
     var newData = [...this.state.listViewData];
-    newData.splice(rowId,1)
-    this.setState({ listViewData: newData });
+    newData.splice(rowId, 1)
+    this.setState({ listViewData:newData });
   }
 
-  showInformation () {
+  showInformation(){
 
   }
 
   render() {
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
     return (
       <Container style={styles.container}>
-        <Header style={{marginTop:StatusBar.currentHeight, backgroundColor: '#ffffff'}}>
+        <Header style={{ marginTop:StatusBar.currentHeight, backgroundColor: '#eeeeee' }}>
           <Content>
             <Item>
-              <Input 
-                onChangeText = {(newContact) => this.setState({ newContact })}
+              <Input
+              onChangeText = {(newContact) =>this.setState({ newContact })} 
                 placeholder="Add name"
               />
-              <Button onPress={() =>this.addRow(this.state.newContact)}>
-                <Icon name="add"/>
+              <Button style={{ marginTop: 5 }}
+                onPress={() =>alert('Add')}
+              >
+                <Icon name="add" />
               </Button>
             </Item>
           </Content>
@@ -89,19 +92,19 @@ export default class Todo extends React.Component {
                 <Text> {data.val().name} </Text>
               </ListItem>
             }
-            renderLeftHiddenRow={data =>
+            renderLeftHiddenRow={data => 
               <Button full onPress={() => this.addRow(data)}>
                 <Icon name="information-circle"/>
               </Button>
             }
 
-            renderRightHiddenRow={ (data, secId, rowId, rowMap) =>
-              <Button full danger onPress={() =>this.deleteRow(secId,rowId,rowMap,data)}>
+            renderRightHiddenRow={(data, secId, rowId, rowMap) => 
+              <Button danger onPress={() =>this.deleteRow(secId, rowId, rowMap, data)}>
                 <Icon name="trash"/>
               </Button>
             }
 
-            leftOpenValue={-75}
+            leftOpenValue={75}
             rightOpenValue={-75}
           />
         </Content>
@@ -113,6 +116,6 @@ export default class Todo extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff'
+    backgroundColor: '#fff'
   },
 });
